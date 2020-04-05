@@ -13,23 +13,21 @@ namespace BybitAloConsole
         {
             var x = new NewMainViewModel(ws);
             x.Connect(ApiKey, ApiSecret);
-            operate().Wait();
-            Console.WriteLine("Hi");
             while (true) { };
         }
-        static async Task operate()
-        {
-            var order = new Order
-            {
-                Price = 4800,
-                Qty = 1,
-                Symbol = "BTCUSD",
-                Side = Side.Buy,
-                OrderType = "Limit",
-                PostOnly = false
-            };
-            await activeApi.PlaceOrder(order);
-            Console.WriteLine("Posted");
-        }
+        //static async Task operate()
+        //{
+        //    var order = new Order
+        //    {
+        //        Price = 4800,
+        //        Qty = 1,
+        //        Symbol = "BTCUSD",
+        //        Side = Side.Buy,
+        //        OrderType = "Limit",
+        //        PostOnly = false
+        //    };
+        //    await activeApi.PlaceOrder(order);
+        //    Console.WriteLine("Posted");
+        //}
     }
 }
