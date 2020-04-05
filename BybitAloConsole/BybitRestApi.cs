@@ -21,7 +21,7 @@ namespace BybitAloConsole
 
         string apiKey;
         string apiSecret;
-
+        HttpClient client = new HttpClient();
         public BybitApi(string _apiKey, string _apiSecret)
         {
             this.apiKey = _apiKey;
@@ -148,9 +148,8 @@ namespace BybitAloConsole
 
         public async Task AmendOrder(Order order)
         {
-            var param = "/open-api/order/replace";
             using var request =
-                new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}{param}");
+                new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}/open-api/order/replace");
             using var client = new HttpClient();
 
             var jsonContent = new
@@ -171,16 +170,12 @@ namespace BybitAloConsole
 
         public async Task AmendOrderTwo(string orderId, double price)
         {
-            var param = "/open-api/order/replace";
             using var request =
-                new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}{param}");
-            using var client = new HttpClient();
-
+                new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}/open-api/order/replace");
             var jsonContent = new
             {
                 order_id = orderId,
                 symbol = "BTCUSD",
-                //                p_r_qty = 1,
                 p_r_price = price.ToString("F1")
             };
             string json = JsonConvert.SerializeObject(jsonContent);

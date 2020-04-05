@@ -3,6 +3,8 @@ using System;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using WebSocket4Net;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 
 namespace BybitAloConsole
 {
@@ -63,59 +65,59 @@ namespace BybitAloConsole
         {
             try
             {
-                var result = JsonSerializer.Deserialize<dynamic>(e.Message);
-                var last = result["data"][result["data"].Count - 1];
-                if (result["topic"] == "trade.BTCUSD")
+                var result = JObject.Parse(e.Message);
+                var t = result["data"];
+                var last = result["data"][result["data"].Count() - 1];
+                var price = (double)last["price"];
+                var side = (string)last["side"];
+                var status = (string)last["order_status"];
+                if ((string)result["topic"] == "trade.BTCUSD")
                 {
-                    if(activeOrder != "")
+                    if (activeOrder != "")
                     {
-                        if(last["side"] == "Buy")
+                        if (side == "Buy")
                         {
-                            if(last["price"] > buyPrice)
+                            if (price > buyPrice)
                             {
-                                activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? last["price"] - 0.5 : last["price"]);
-                                buyPrice = last["price"];
-                                sellPrice = last["price"] - 0.5;
+                                activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? price - 0.5 : price);
+                                buyPrice = price;
+                                sellPrice = price - 0.5;
                             }
                         }
-                        else if (last["side"] == "Sell")
+                        else if (side == "Sell")
                         {
-                            if (last["price"] < sellPrice)
+                            if (price < sellPrice)
                             {
-                                activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? last["price"] : last["price"] + 0.5);
-                                buyPrice = last["price"] + 0.5;
-                                sellPrice = last["price"];
+                                activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? price : price + 0.5);
+                                buyPrice = price + 0.5;
+                                sellPrice = price;
                             }
                         }
                     }
-                    if (activeOrder != "" && activeOrderSide == "Buy" && last["price"] > buyPrice && last["side"] == "Buy")
+                    if (activeOrder != "" && activeOrderSide == "Buy" && price > buyPrice && side == "Buy")
                     {
-                        activeApi.AmendOrderTwo(activeOrder, last["price"]);
+                        activeApi.AmendOrderTwo(activeOrder, price);
                         Console.WriteLine("AmendOrder");
                     }
-                    else if (activeOrder != "" && activeOrderSide == "Sell" && last["price"] < sellPrice && last["side"] == "Sell")
+                    else if (activeOrder != "" && activeOrderSide == "Sell" && price < sellPrice && side == "Sell")
                     {
-                        activeApi.AmendOrderTwo(activeOrder, last["price"]);
+                        activeApi.AmendOrderTwo(activeOrder, price);
                         Console.WriteLine("AmendOrder");
                     }
-                    if (last["side"] == "Buy")
-                        buyPrice = last["price"];
-                    else
-                        sellPrice = last.price;
                 }
-                if (result["topic"] == "order")
+                if ((string)result["topic"] == "order")
                 {
-                    
-                    if ((last["order_status"] == "Filled" || last["order_status"] == "Cancelled") && (last["order_id"] == activeOrder))
+
+                    if ((status == "Filled" || status == "Cancelled") && ((string)last["order_id"] == activeOrder))
                     {
                         activeOrder = "";
                         buyPrice = 0;
                         sellPrice = 99999;
                     }
-                    else if (last["order_status"] == "New" && last["qty"] % 10 == 9)
+                    else if (status == "New" && (int)last["qty"] % 10 == 9)
                     {
-                        activeOrder = last["order_id"];
-                        activeOrderSide = last["side"];
+                        activeOrder = (string)last["order_id"];
+                        activeOrderSide = side;
 
                     }
                 }

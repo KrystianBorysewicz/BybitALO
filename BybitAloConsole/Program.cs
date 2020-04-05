@@ -5,8 +5,8 @@ namespace BybitAloConsole
 {
     class Program
     {
-        static string ApiKey = "";
-        static string ApiSecret = "";
+        static string ApiKey = "pEnH5T6ElPjXFWJzMo";
+        static string ApiSecret = "L4etKh0akyYG8qkWQWLBqoE9ojMj8EX9w2Ey";
         static BybitApi activeApi = new BybitApi(ApiKey, ApiSecret);
         static IWebsocket ws = new Websocket4Net("wss://stream.bybit.com/realtime", ApiKey, ApiSecret);
         static void Main(string[] args)
