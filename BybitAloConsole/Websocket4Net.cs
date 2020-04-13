@@ -97,12 +97,12 @@ namespace BybitAloConsole
                     if (activeOrder != "" && activeOrderSide == "Buy" && price > buyPrice && side == "Buy")
                     {
                         activeApi.AmendOrderTwo(activeOrder, price);
-                        Console.WriteLine("AmendOrder");
+                        //Console.WriteLine("AmendOrder");
                     }
                     else if (activeOrder != "" && activeOrderSide == "Sell" && price < sellPrice && side == "Sell")
                     {
                         activeApi.AmendOrderTwo(activeOrder, price);
-                        Console.WriteLine("AmendOrder");
+                        //Console.WriteLine("AmendOrder");
                     }
                 }
                 if ((string)result["topic"] == "order")
@@ -121,11 +121,82 @@ namespace BybitAloConsole
 
                     }
                 }
-                Console.WriteLine(e.Message);
-            } catch { }
-            
+                //Console.WriteLine(e.Message);
+            }
+            catch { }
+
         }
 
+        //async void WsOnMessageReceived(object sender, MessageReceivedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        var result = JObject.Parse(e.Message);
+        //        var t = result["data"];
+        //        var last = result["data"][result["data"].Count() - 1];
+        //        var price = (double)last["price"];
+        //        var side = (string)last["side"];
+        //        var status = (string)last["order_status"];
+        //        if ((string)result["topic"] == "trade.BTCUSD")
+        //        {
+        //            if (activeOrder != "")
+        //            {
+        //                if (side == "Buy")
+        //                {
+        //                    if (price > buyPrice)
+        //                    {
+        //                        await activeApi.PlaceNewOrder(activeOrderSide, "BTCUSD", "Limit", activeOrderSide == "Buy" ? price - 0.5 : price, 10, true);
+        //                        //activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? price - 0.5 : price);
+        //                        buyPrice = price;
+        //                        sellPrice = price - 0.5;
+        //                    }
+        //                }
+        //                else if (side == "Sell")
+        //                {
+        //                    if (price < sellPrice)
+        //                    {
+        //                        await activeApi.PlaceNewOrder(activeOrderSide, "BTCUSD", "Limit", activeOrderSide == "Buy" ? price : price + 0.5, 10, true);
+        //                        //activeApi.AmendOrderTwo(activeOrder, activeOrderSide == "Buy" ? price : price + 0.5);
+        //                        buyPrice = price + 0.5;
+        //                        sellPrice = price;
+        //                    }
+        //                }
+        //            }
+        //            if (activeOrder != "" && activeOrderSide == "Buy" && price > buyPrice && side == "Buy")
+        //            {
+        //                await activeApi.PlaceNewOrder(activeOrderSide, "BTCUSD", "Limit", price, 10, true);
+        //                //activeApi.AmendOrderTwo(activeOrder, price);
+        //                //Console.WriteLine("AmendOrder");
+        //            }
+        //            else if (activeOrder != "" && activeOrderSide == "Sell" && price < sellPrice && side == "Sell")
+        //            {
+        //                await activeApi.PlaceNewOrder(activeOrderSide, "BTCUSD", "Limit", price, 10, true);
+        //                //activeApi.AmendOrderTwo(activeOrder, price);
+        //                //Console.WriteLine("AmendOrder");
+        //            }
+        //        }
+        //        if ((string)result["topic"] == "order")
+        //        {
+
+        //            if (status == "Filled")
+        //            {
+        //                activeOrder = "";
+        //                buyPrice = 0;
+        //                sellPrice = 99999;
+        //                await activeApi.CancelAll();
+        //            }
+        //            else if (status == "New" && (int)last["qty"] % 10 == 9)
+        //            {
+        //                activeOrder = (string)last["order_id"];
+        //                activeOrderSide = side;
+
+        //            }
+        //        }
+        //        //Console.WriteLine(e.Message);
+        //    }
+        //    catch { }
+
+        //}
         async void WsOnClosed(object sender, EventArgs e)
         {
             await this.Connect();

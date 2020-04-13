@@ -99,6 +99,34 @@ namespace BybitAloConsole
             Console.WriteLine("Response: " + responseJson.ToString());
         }
 
+        public async Task PlaceNewOrder(string side, string symbol, string orderType, double price, int qty, bool postOnly)
+        {
+            var param = "/v2/private/order/create";
+            using var request = new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}{param}");
+            using var client = new HttpClient();
+
+            dynamic jsonContent = new ExpandoObject();
+            jsonContent.side = side;
+            jsonContent.symbol = symbol;
+            jsonContent.order_type = orderType;
+            jsonContent.price = price;
+            jsonContent.qty = qty;
+
+            if (postOnly)
+                jsonContent.time_in_force = "PostOnly";
+            else
+                jsonContent.time_in_force = "GoodTillCancel";
+
+            string json = JsonConvert.SerializeObject(jsonContent);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await request.Authenticate(this.apiKey, this.apiSecret);
+
+            Console.WriteLine("Request: " + request.ToString());
+            HttpResponseMessage httpResponseMessage = await client.SendAsync(request);
+            var responseJson = JObject.Parse(await httpResponseMessage.Content.ReadAsStringAsync());
+            Console.WriteLine("Response: " + responseJson.ToString());
+        }
+
         public async Task PlaceStopOrder(Order order, double currentPrice, double stopPx)
         {
             var param = "/open-api/stop-order/create";
@@ -177,6 +205,23 @@ namespace BybitAloConsole
                 order_id = orderId,
                 symbol = "BTCUSD",
                 p_r_price = price.ToString("F1")
+            };
+            string json = JsonConvert.SerializeObject(jsonContent);
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            await request.Authenticate(this.apiKey, this.apiSecret);
+
+            HttpResponseMessage httpResponseMessage = await client.SendAsync(request);
+            var responseJson = JObject.Parse(await httpResponseMessage.Content.ReadAsStringAsync());
+            Console.WriteLine(responseJson.ToString());
+        }
+
+        public async Task CancelAll()
+        {
+            using var request =
+                new HttpRequestMessage(HttpMethod.Post, $"{BaseUri}/v2/private/order/cancelAll");
+            var jsonContent = new
+            {
+                symbol = "BTCUSD",
             };
             string json = JsonConvert.SerializeObject(jsonContent);
             request.Content = new StringContent(json, Encoding.UTF8, "application/json");
